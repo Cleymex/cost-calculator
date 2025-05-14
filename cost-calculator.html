@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printing Cost Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .calculator-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input[type="number"],
+        .input-group input[type="text"] {
+            width: calc(100% - 22px); /* Account for padding */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        
+        .input-group input[type="number"]:focus,
+        .input-group input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .time-inputs .input-group {
+            flex: 1;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #result-area {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #eaf6ff;
+            border-left: 5px solid #3498db;
+            border-radius: 5px;
+        }
+
+        #result-area h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+        }
+        
+        #result-area p {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+
+        #total-cost-display {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #27ae60;
+        }
+        
+        .fixed-cost-display {
+            font-style: italic;
+            color: #7f8c8d;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h1>Printing Cost Calculator</h1>
+
+        <div class="input-group">
+            <label>Startup Cost:</label>
+            <div id="startupCostDisplay" class="fixed-cost-display">€5.00 (Fixed)</div>
+        </div>
+
+        <div class="input-group">
+            <label>Cost per Hour of Printing:</label>
+            <div id="fixedCostPerHourDisplay" class="fixed-cost-display">€1.50 (Fixed)</div>
+        </div>
+
+        <label>Printing Time:</label>
+        <div class="time-inputs">
+            <div class="input-group">
+                <label for="hours">Hours:</label>
+                <input type="number" id="hours" min="0" placeholder="e.g., 2" value="0">
+            </div>
+            <div class="input-group">
+                <label for="minutes">Minutes:</label>
+                <input type="number" id="minutes" min="0" max="59" placeholder="e.g., 30" value="0">
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="materialCost">Material Cost (€):</label>
+            <input type="number" id="materialCost" min="0" step="0.01" placeholder="e.g., 12.75" value="0">
+        </div>
+
+        <button id="calculateButton">Calculate Total Cost</button> <!-- Removed onclick, added ID -->
+
+        <div id="result-area" style="display: none;">
+            <h2>Cost Breakdown:</h2>
+            <p id="startup-cost-result"></p>
+            <p id="time-cost-result"></p>
+            <p id="material-cost-result"></p>
+            <hr>
+            <p id="total-cost-display"></p>
+        </div>
+    </div>
+
+    <script>
+        const STARTUP_COST = 5.00;
+        const FIXED_COST_PER_HOUR = 1.50;
+
+        function calculateCost() {
+            // Get input values
+            const hours = parseFloat(document.getElementById('hours').value) || 0;
+            const minutes = parseFloat(document.getElementById('minutes').value) || 0;
+            const materialCostInput = parseFloat(document.getElementById('materialCost').value) || 0;
+
+            // Validate inputs
+            if (hours < 0 || minutes < 0 || materialCostInput < 0) {
+                alert("Please enter non-negative values for time and material cost.");
+                return;
+            }
+            if (minutes >= 60) {
+                alert("Minutes should be less than 60.");
+                return;
+            }
+
+            // Calculate total printing time in hours
+            const totalPrintingHours = hours + (minutes / 60);
+
+            // Calculate individual cost components
+            const printingTimeCost = totalPrintingHours * FIXED_COST_PER_HOUR;
+            const materialCost = materialCostInput;
+
+            // Calculate total cost
+            const totalCost = STARTUP_COST + printingTimeCost + materialCost;
+
+            // Display results
+            const resultArea = document.getElementById('result-area');
+            document.getElementById('startup-cost-result').textContent = `Startup Cost: €${STARTUP_COST.toFixed(2)}`;
+            document.getElementById('time-cost-result').textContent = `Printing Time Cost (${totalPrintingHours.toFixed(2)} hrs @ €${FIXED_COST_PER_HOUR.toFixed(2)}/hr): €${printingTimeCost.toFixed(2)}`;
+            document.getElementById('material-cost-result').textContent = `Material Cost: €${materialCost.toFixed(2)}`;
+            document.getElementById('total-cost-display').textContent = `Total Estimated Cost: €${totalCost.toFixed(2)}`;
+            
+            resultArea.style.display = 'block';
+        }
+
+        // Wait for the DOM to be fully loaded before attaching event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const calcButton = document.getElementById('calculateButton');
+            if (calcButton) {
+                calcButton.addEventListener('click', calculateCost);
+            } else {
+                console.error("Calculate button not found. Check the button's ID.");
+            }
+
+            // You could also set the fixed display values here if they weren't hardcoded in HTML
+            // document.getElementById('startupCostDisplay').textContent = `€${STARTUP_COST.toFixed(2)} (Fixed)`;
+            // document.getElementById('fixedCostPerHourDisplay').textContent = `€${FIXED_COST_PER_HOUR.toFixed(2)} (Fixed)`;
+        });
+    </script>
+
+</body>
+</html>
